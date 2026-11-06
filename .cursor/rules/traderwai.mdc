@@ -1,0 +1,27 @@
+---
+description: How to use the TraderWAI MCP server (live charts, backtests, broker orders) safely
+alwaysApply: false
+---
+
+# Trading with TraderWAI
+
+TraderWAI (MCP server `https://mcp.traderwai.com`) gives you live market charts and data, backtests on 1-minute history and access to the user's own broker accounts. Follow these rules whenever you use its tools.
+
+## Look before you talk
+- Use `get_chart` to see the market (higher timeframe first, then the entry timeframe) and `get_ohlc` for exact prices and candle times. Never invent prices or levels.
+- Use `get_market_structure` for trend, breaks of structure and swing levels.
+- When you show an analysis, draw it with `draw_chart`. Never generate chart images yourself.
+
+## Orders
+- Do not place, modify or close anything unless the user explicitly asks in this conversation.
+- Before any order, call `get_quote` for the broker's bid/ask and compute entry, stop loss and take profit from it.
+- Size from risk ("risk 0.5% of the account"), never a fixed lot the user didn't give you. Every order needs a stop loss.
+- If you are not sure the user wants execution now, use `suggest_order` instead of `execute_trade`: it waits for their approval.
+- Rules that must fire at a price or time (break-even, close at a level, entry on a candle close) belong in `create_conditional_order`, which TraderWAI checks every minute. Don't simulate them with polling.
+
+## Backtests
+- Use `backtest_strategy` for "how would this have worked". Don't compute backtests from candles yourself.
+- Report win rate, total R, drawdown and number of trades, and say plainly when the sample is too small.
+
+## Tone
+- Describe what the data shows. No promises, no "guaranteed" setups. Remind the user that trading involves risk when you discuss a trade.
